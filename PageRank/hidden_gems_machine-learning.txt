@@ -1,0 +1,63 @@
+Hidden Gems in machine-learning
+======================================================================
+
+1. primaryobjects/lda
+   Stars: 298
+   PageRank: 0.059040
+   Gem Score: 198.12
+   URL: https://github.com/primaryobjects/lda
+
+2. accel-brain/accel-brain-code
+   Stars: 320
+   PageRank: 0.059040
+   Gem Score: 184.50
+   URL: https://github.com/accel-brain/accel-brain-code
+
+3. adamlui/chatgpt-infinity
+   Stars: 342
+   PageRank: 0.059040
+   Gem Score: 172.63
+   URL: https://github.com/adamlui/chatgpt-infinity
+
+4. xandie985/data-scientist-roadmap2024
+   Stars: 347
+   PageRank: 0.059040
+   Gem Score: 170.14
+   URL: https://github.com/xandie985/data-scientist-roadmap2024
+
+5. Beliavsky/Fortran-code-on-GitHub
+   Stars: 369
+   PageRank: 0.059040
+   Gem Score: 160.00
+   URL: https://github.com/Beliavsky/Fortran-code-on-GitHub
+
+6. rohan-paul/MachineLearning-DeepLearning-Code-for-my-YouTube-Channel
+   Stars: 438
+   PageRank: 0.059040
+   Gem Score: 134.79
+   URL: https://github.com/rohan-paul/MachineLearning-DeepLearning-Code-for-my-YouTube-Channel
+
+7. vi3k6i5/GuidedLDA
+   Stars: 512
+   PageRank: 0.059040
+   Gem Score: 115.31
+   URL: https://github.com/vi3k6i5/GuidedLDA
+
+8. gregversteeg/corex_topic
+   Stars: 640
+   PageRank: 0.059040
+   Gem Score: 92.25
+   URL: https://github.com/gregversteeg/corex_topic
+
+9. bigartm/bigartm
+   Stars: 672
+   PageRank: 0.059040
+   Gem Score: 87.86
+   URL: https://github.com/bigartm/bigartm
+
+10. uber-research/PPLM
+   Stars: 1153
+   PageRank: 0.059040
+   Gem Score: 51.21
+   URL: https://github.com/uber-research/PPLM
+
