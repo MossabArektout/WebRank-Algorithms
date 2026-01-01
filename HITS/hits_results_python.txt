@@ -1,0 +1,110 @@
+HITS Analysis Results for Topic: python
+================================================================================
+
+TOP 10 TOOLS (Authorities):
+--------------------------------------------------------------------------------
+1. TheAlgorithms/Python
+   Authority: 1.0000
+   Stars: 216367
+   URL: https://github.com/TheAlgorithms/Python
+
+2. tensorflow/tensorflow
+   Authority: 1.0000
+   Stars: 193136
+   URL: https://github.com/tensorflow/tensorflow
+
+3. pytorch/pytorch
+   Authority: 1.0000
+   Stars: 96267
+   URL: https://github.com/pytorch/pytorch
+
+4. nvbn/thefuck
+   Authority: 1.0000
+   Stars: 95064
+   URL: https://github.com/nvbn/thefuck
+
+5. django/django
+   Authority: 1.0000
+   Stars: 86330
+   URL: https://github.com/django/django
+
+6. astral-sh/uv
+   Authority: 1.0000
+   Stars: 76071
+   URL: https://github.com/astral-sh/uv
+
+7. pallets/flask
+   Authority: 1.0000
+   Stars: 71001
+   URL: https://github.com/pallets/flask
+
+8. ansible/ansible
+   Authority: 1.0000
+   Stars: 67513
+   URL: https://github.com/ansible/ansible
+
+9. keras-team/keras
+   Authority: 1.0000
+   Stars: 63678
+   URL: https://github.com/keras-team/keras
+
+10. scrapy/scrapy
+   Authority: 1.0000
+   Stars: 59354
+   URL: https://github.com/scrapy/scrapy
+
+
+================================================================================
+
+TOP 10 CURATED LISTS (Hubs):
+--------------------------------------------------------------------------------
+1. vinta/awesome-python
+   Hub Score: 1.0000
+   Stars: 276344
+   URL: https://github.com/vinta/awesome-python
+
+2. donnemartin/system-design-primer
+   Hub Score: 0.0000
+   Stars: 330989
+   URL: https://github.com/donnemartin/system-design-primer
+
+3. practical-tutorials/project-based-learning
+   Hub Score: 0.0000
+   Stars: 254197
+   URL: https://github.com/practical-tutorials/project-based-learning
+
+4. TheAlgorithms/Python
+   Hub Score: 0.0000
+   Stars: 216367
+   URL: https://github.com/TheAlgorithms/Python
+
+5. tensorflow/tensorflow
+   Hub Score: 0.0000
+   Stars: 193136
+   URL: https://github.com/tensorflow/tensorflow
+
+6. CyC2018/CS-Notes
+   Hub Score: 0.0000
+   Stars: 183292
+   URL: https://github.com/CyC2018/CS-Notes
+
+7. Significant-Gravitas/AutoGPT
+   Hub Score: 0.0000
+   Stars: 180734
+   URL: https://github.com/Significant-Gravitas/AutoGPT
+
+8. huggingface/transformers
+   Hub Score: 0.0000
+   Stars: 154492
+   URL: https://github.com/huggingface/transformers
+
+9. yt-dlp/yt-dlp
+   Hub Score: 0.0000
+   Stars: 140253
+   URL: https://github.com/yt-dlp/yt-dlp
+
+10. 521xueweihan/HelloGitHub
+   Hub Score: 0.0000
+   Stars: 138929
+   URL: https://github.com/521xueweihan/HelloGitHub
+
