@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 # Movies network
@@ -323,8 +325,271 @@ def display_salsa_results(authority_scores, hub_scores, movies):
     print(f"   → Best gateway to other good movies (leads to quality)")
     print("=" * 80)
 
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+def visualize_network_with_scores(links, authority_scores, hub_scores, movies):
+    """
+    Create visual representation of the network with SALSA scores
+    
+    Creates 3 subplots:
+    1. Original recommendation network
+    2. Authority scores (node size = authority score)
+    3. Hub scores (node size = hub score)
+    """
+    
+    # Create figure with 3 subplots
+    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+    fig.suptitle('SALSA Algorithm - Movie Recommendation Network', 
+                 fontsize=16, fontweight='bold')
+    
+    n = len(movies)
+    
+    # Create a circular layout for nodes
+    angles = np.linspace(0, 2 * np.pi, n, endpoint=False)
+    pos = {i: (np.cos(angle), np.sin(angle)) for i, angle in enumerate(angles)}
+    
+    # ========================================================================
+    # SUBPLOT 1: Original Network
+    # ========================================================================
+    ax1 = axes[0]
+    ax1.set_title('Original Recommendation Network', fontsize=12, fontweight='bold')
+    ax1.set_xlim(-1.5, 1.5)
+    ax1.set_ylim(-1.5, 1.5)
+    ax1.axis('off')
+    
+    # Draw edges (recommendations)
+    for i in range(n):
+        for j in range(n):
+            if links[i][j] == 1:
+                x1, y1 = pos[i]
+                x2, y2 = pos[j]
+                ax1.arrow(x1, y1, (x2-x1)*0.85, (y2-y1)*0.85,
+                         head_width=0.05, head_length=0.05,
+                         fc='gray', ec='gray', alpha=0.3, linewidth=0.5)
+    
+    # Draw nodes (equal size)
+    for i in range(n):
+        x, y = pos[i]
+        circle = plt.Circle((x, y), 0.15, color='lightblue', ec='black', linewidth=2)
+        ax1.add_patch(circle)
+        
+        # Add movie name
+        ax1.text(x, y-0.35, movies[i], ha='center', va='top', 
+                fontsize=8, fontweight='bold')
+    
+    # ========================================================================
+    # SUBPLOT 2: Authority Scores
+    # ========================================================================
+    ax2 = axes[1]
+    ax2.set_title('Authority Scores (Best Movies)', fontsize=12, fontweight='bold')
+    ax2.set_xlim(-1.5, 1.5)
+    ax2.set_ylim(-1.5, 1.5)
+    ax2.axis('off')
+    
+    # Normalize scores for visualization
+    max_auth = max(authority_scores)
+    
+    # Draw edges
+    for i in range(n):
+        for j in range(n):
+            if links[i][j] == 1:
+                x1, y1 = pos[i]
+                x2, y2 = pos[j]
+                ax2.arrow(x1, y1, (x2-x1)*0.85, (y2-y1)*0.85,
+                         head_width=0.05, head_length=0.05,
+                         fc='gray', ec='gray', alpha=0.2, linewidth=0.5)
+    
+    # Draw nodes (size = authority score)
+    for i in range(n):
+        x, y = pos[i]
+        size = 0.1 + (authority_scores[i] / max_auth) * 0.3  # Scale size
+        
+        # Color intensity based on score
+        intensity = authority_scores[i] / max_auth
+        color = plt.cm.Reds(0.3 + intensity * 0.7)
+        
+        circle = plt.Circle((x, y), size, color=color, ec='darkred', linewidth=2)
+        ax2.add_patch(circle)
+        
+        # Add movie name and score
+        ax2.text(x, y-size-0.15, f"{movies[i]}\n{authority_scores[i]:.3f}", 
+                ha='center', va='top', fontsize=7, fontweight='bold')
+    
+    # ========================================================================
+    # SUBPLOT 3: Hub Scores
+    # ========================================================================
+    ax3 = axes[2]
+    ax3.set_title('Hub Scores (Gateway Movies)', fontsize=12, fontweight='bold')
+    ax3.set_xlim(-1.5, 1.5)
+    ax3.set_ylim(-1.5, 1.5)
+    ax3.axis('off')
+    
+    # Normalize scores
+    max_hub = max(hub_scores)
+    
+    # Draw edges
+    for i in range(n):
+        for j in range(n):
+            if links[i][j] == 1:
+                x1, y1 = pos[i]
+                x2, y2 = pos[j]
+                ax3.arrow(x1, y1, (x2-x1)*0.85, (y2-y1)*0.85,
+                         head_width=0.05, head_length=0.05,
+                         fc='gray', ec='gray', alpha=0.2, linewidth=0.5)
+    
+    # Draw nodes (size = hub score)
+    for i in range(n):
+        x, y = pos[i]
+        size = 0.1 + (hub_scores[i] / max_hub) * 0.3
+        
+        # Color intensity based on score
+        intensity = hub_scores[i] / max_hub
+        color = plt.cm.Blues(0.3 + intensity * 0.7)
+        
+        circle = plt.Circle((x, y), size, color=color, ec='darkblue', linewidth=2)
+        ax3.add_patch(circle)
+        
+        # Add movie name and score
+        ax3.text(x, y-size-0.15, f"{movies[i]}\n{hub_scores[i]:.3f}", 
+                ha='center', va='top', fontsize=7, fontweight='bold')
+    
+    # Add legend
+    fig.text(0.5, 0.02, 
+             'Node size = score magnitude | Darker color = higher score | Arrows = recommendations',
+             ha='center', fontsize=10, style='italic')
+    
+    plt.tight_layout(rect=[0, 0.03, 1, 0.96])
+    
+    # Save
+    filename = 'salsa_movie_network.png'
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    print(f"\n💾 Visualization saved: {filename}")
+    
+    plt.show()
+
+def plot_score_comparison(authority_scores, hub_scores, movies):
+    """
+    Create bar chart comparing authority vs hub scores
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle('SALSA Scores Comparison', fontsize=16, fontweight='bold')
+    
+    # Sort by scores
+    auth_sorted_idx = np.argsort(authority_scores)[::-1]
+    hub_sorted_idx = np.argsort(hub_scores)[::-1]
+    
+    # ========================================================================
+    # Authority Scores
+    # ========================================================================
+    ax1.barh(range(len(movies)), 
+             [authority_scores[i] for i in auth_sorted_idx],
+             color='crimson', alpha=0.7, edgecolor='darkred', linewidth=1.5)
+    ax1.set_yticks(range(len(movies)))
+    ax1.set_yticklabels([movies[i] for i in auth_sorted_idx])
+    ax1.set_xlabel('Authority Score', fontsize=11, fontweight='bold')
+    ax1.set_title('🏆 Authority Scores\n(Best Quality Movies)', fontsize=12)
+    ax1.grid(axis='x', alpha=0.3)
+    ax1.invert_yaxis()
+    
+    # Add score labels
+    for i, idx in enumerate(auth_sorted_idx):
+        score = authority_scores[idx]
+        ax1.text(score + 0.005, i, f'{score:.3f}', 
+                va='center', fontsize=9, fontweight='bold')
+    
+    # ========================================================================
+    # Hub Scores
+    # ========================================================================
+    ax2.barh(range(len(movies)), 
+             [hub_scores[i] for i in hub_sorted_idx],
+             color='royalblue', alpha=0.7, edgecolor='darkblue', linewidth=1.5)
+    ax2.set_yticks(range(len(movies)))
+    ax2.set_yticklabels([movies[i] for i in hub_sorted_idx])
+    ax2.set_xlabel('Hub Score', fontsize=11, fontweight='bold')
+    ax2.set_title('📚 Hub Scores\n(Best Gateway Movies)', fontsize=12)
+    ax2.grid(axis='x', alpha=0.3)
+    ax2.invert_yaxis()
+    
+    # Add score labels
+    for i, idx in enumerate(hub_sorted_idx):
+        score = hub_scores[idx]
+        ax2.text(score + 0.005, i, f'{score:.3f}', 
+                va='center', fontsize=9, fontweight='bold')
+    
+    plt.tight_layout()
+    
+    # Save
+    filename = 'salsa_score_comparison.png'
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    print(f"💾 Comparison chart saved: {filename}")
+    
+    plt.show()
+
+def plot_authority_vs_hub(authority_scores, hub_scores, movies):
+    """
+    Scatter plot: Authority vs Hub scores
+    Shows which movies are authorities, hubs, or both
+    """
+    plt.figure(figsize=(10, 8))
+    
+    # Create scatter plot
+    plt.scatter(hub_scores, authority_scores, 
+               s=300, c='purple', alpha=0.6, edgecolors='black', linewidth=2)
+    
+    # Add movie labels
+    for i, movie in enumerate(movies):
+        plt.annotate(movie, (hub_scores[i], authority_scores[i]),
+                    xytext=(5, 5), textcoords='offset points',
+                    fontsize=9, fontweight='bold',
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor='yellow', alpha=0.3))
+    
+    # Add quadrant lines
+    mean_auth = np.mean(authority_scores)
+    mean_hub = np.mean(hub_scores)
+    
+    plt.axhline(y=mean_auth, color='red', linestyle='--', alpha=0.5, linewidth=1)
+    plt.axvline(x=mean_hub, color='blue', linestyle='--', alpha=0.5, linewidth=1)
+    
+    # Label quadrants
+    max_auth = max(authority_scores)
+    max_hub = max(hub_scores)
+    
+    plt.text(max_hub * 0.8, max_auth * 0.95, 
+            'High Authority\nHigh Hub\n(Best Overall)', 
+            ha='center', fontsize=10, fontweight='bold',
+            bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.7))
+    
+    plt.text(max_hub * 0.2, max_auth * 0.95, 
+            'High Authority\nLow Hub\n(Quality Content)', 
+            ha='center', fontsize=10, fontweight='bold',
+            bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.7))
+    
+    plt.text(max_hub * 0.8, max_auth * 0.2, 
+            'Low Authority\nHigh Hub\n(Gateway Movies)', 
+            ha='center', fontsize=10, fontweight='bold',
+            bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.7))
+    
+    plt.text(max_hub * 0.2, max_auth * 0.2, 
+            'Low Authority\nLow Hub\n(Niche Movies)', 
+            ha='center', fontsize=10, fontweight='bold',
+            bbox=dict(boxstyle='round', facecolor='lightgray', alpha=0.7))
+    
+    plt.xlabel('Hub Score (Gateway Quality)', fontsize=12, fontweight='bold')
+    plt.ylabel('Authority Score (Content Quality)', fontsize=12, fontweight='bold')
+    plt.title('SALSA: Authority vs Hub Scores\nMovie Positioning', 
+             fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    
+    # Save
+    filename = 'salsa_authority_vs_hub.png'
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    print(f"💾 Scatter plot saved: {filename}")
+    
+    plt.show()
+
 def main():
-    """Main function - now with SALSA scoring!"""
+    """Main function with visualizations"""
     
     # Phase 1: Show network
     print_network_info(movies, links)
@@ -344,7 +609,29 @@ def main():
     # Display results
     display_salsa_results(authority_scores, hub_scores, movies)
     
-    # Store results for potential Phase 4
+    # Phase 4: CREATE VISUALIZATIONS!
+    print("\n" + "=" * 70)
+    print("🎨 CREATING VISUALIZATIONS...")
+    print("=" * 70)
+    
+    # 1. Network with scores
+    visualize_network_with_scores(links, authority_scores, hub_scores, movies)
+    
+    # 2. Bar chart comparison
+    plot_score_comparison(authority_scores, hub_scores, movies)
+    
+    # 3. Authority vs Hub scatter
+    plot_authority_vs_hub(authority_scores, hub_scores, movies)
+    
+    print("\n" + "=" * 70)
+    print("✅ ALL VISUALIZATIONS COMPLETE!")
+    print("=" * 70)
+    print("\nGenerated files:")
+    print("  📊 salsa_movie_network.png - Network with score visualization")
+    print("  📊 salsa_score_comparison.png - Bar charts of scores")
+    print("  📊 salsa_authority_vs_hub.png - Scatter plot comparison")
+    print("=" * 70)
+    
     return authority_scores, hub_scores
 
 if __name__ == "__main__":
