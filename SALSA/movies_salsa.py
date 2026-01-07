@@ -157,32 +157,195 @@ def visualize_graphs(authority_graph, hub_graph, movies):
     
     print()
 
-def main():
-    """Main function to run SALSA Phase 2"""
+def create_transition_matrix(graph):
+    """
+    Convert graph to transition matrix for random walk
     
-    # Show original network
+    Transition matrix: Each row is a probability distribution
+    - If movie i connects to movies j, k, l → equal probability to each
+    - If movie i has no connections → equal probability to ALL movies
+    
+    Args:
+        graph: adjacency matrix (authority or hub graph)
+    
+    Returns:
+        transition_matrix: stochastic matrix for random walk
+    """
+    n = len(graph)
+    transition = np.zeros((n, n))
+    
+    for i in range(n):
+        # Get all connections from movie i
+        row_sum = np.sum(graph[i])
+        
+        if row_sum > 0:
+            # Normalize: equal probability to each connected movie
+            transition[i] = graph[i] / row_sum
+        else:
+            # Isolated movie: equal probability to ALL movies
+            transition[i] = np.ones(n) / n
+    
+    return transition
+
+def power_iteration(transition_matrix, max_iterations=100, tolerance=1e-6, verbose=True):
+    """
+    Perform power iteration to find stationary distribution
+    
+    This simulates a random walk until probabilities stabilize
+    
+    Args:
+        transition_matrix: stochastic matrix
+        max_iterations: maximum iterations
+        tolerance: convergence threshold
+        verbose: print progress
+    
+    Returns:
+        scores: stationary distribution (converged probabilities)
+    """
+    n = len(transition_matrix)
+    
+    # Start with uniform distribution
+    scores = np.ones(n) / n
+    
+    if verbose:
+        print("  Starting random walk...")
+        print(f"  Initial scores: all = {scores[0]:.4f}")
+        print()
+    
+    for iteration in range(max_iterations):
+        # One step of random walk
+        # New probability = sum of (probability of being at j) × (prob of j→i)
+        new_scores = transition_matrix.T @ scores
+        
+        # Normalize (should already sum to 1, but numerical stability)
+        new_scores = new_scores / np.sum(new_scores)
+        
+        # Check convergence
+        change = np.max(np.abs(new_scores - scores))
+        
+        if verbose and (iteration < 3 or (iteration + 1) % 20 == 0):
+            top_idx = np.argmax(new_scores)
+            print(f"  Iteration {iteration + 1:3d}: max change = {change:.6f}, top movie = {movies[top_idx]}")
+        
+        scores = new_scores
+        
+        if change < tolerance:
+            if verbose:
+                print(f"\n  ✅ Converged after {iteration + 1} iterations!")
+            break
+    
+    return scores
+
+def calculate_salsa_scores(authority_graph, hub_graph, max_iterations=100):
+    """
+    Calculate SALSA authority and hub scores
+    
+    Args:
+        authority_graph: graph of movies with common recommenders
+        hub_graph: graph of movies with common recommendations
+        max_iterations: max iterations for convergence
+    
+    Returns:
+        authority_scores: authority score for each movie
+        hub_scores: hub score for each movie
+    """
+    print("\n" + "=" * 70)
+    print("🔮 CALCULATING SALSA SCORES")
+    print("=" * 70)
+    
+    # Step 1: Create transition matrices
+    print("\n📐 Creating transition matrices...")
+    auth_transition = create_transition_matrix(authority_graph)
+    hub_transition = create_transition_matrix(hub_graph)
+    print("  ✅ Transition matrices ready")
+    
+    # Step 2: Calculate authority scores
+    print("\n🏆 Calculating AUTHORITY scores (random walk on authority graph):")
+    print("-" * 70)
+    authority_scores = power_iteration(auth_transition, max_iterations)
+    
+    # Step 3: Calculate hub scores
+    print("\n📚 Calculating HUB scores (random walk on hub graph):")
+    print("-" * 70)
+    hub_scores = power_iteration(hub_transition, max_iterations)
+    
+    print("\n" + "=" * 70)
+    print("✅ SALSA CALCULATION COMPLETE!")
+    print("=" * 70)
+    
+    return authority_scores, hub_scores
+
+def display_salsa_results(authority_scores, hub_scores, movies):
+    """
+    Display SALSA results in a nice format
+    """
+    print("\n" + "=" * 80)
+    print("🎬 SALSA RESULTS - MOVIE RANKINGS")
+    print("=" * 80)
+    
+    # Sort by authority
+    auth_ranking = sorted(range(len(movies)), 
+                         key=lambda i: authority_scores[i], 
+                         reverse=True)
+    
+    # Sort by hub
+    hub_ranking = sorted(range(len(movies)), 
+                        key=lambda i: hub_scores[i], 
+                        reverse=True)
+    
+    # Display side by side
+    print(f"\n{'AUTHORITIES (Best Movies)':<40} {'HUBS (Gateway Movies)'}")
+    print(f"{'='*40} {'='*40}")
+    
+    for rank in range(len(movies)):
+        auth_idx = auth_ranking[rank]
+        hub_idx = hub_ranking[rank]
+        
+        auth_name = movies[auth_idx]
+        hub_name = movies[hub_idx]
+        
+        auth_score = authority_scores[auth_idx]
+        hub_score = hub_scores[hub_idx]
+        
+        auth_bar = "█" * int(auth_score * 100)
+        hub_bar = "█" * int(hub_score * 100)
+        
+        print(f"{rank+1}. {auth_name:<25} {auth_score:>6.4f} {auth_bar[:10]:<10} | "
+              f"{rank+1}. {hub_name:<25} {hub_score:>6.4f} {hub_bar[:10]}")
+    
+    print("\n" + "=" * 80)
+    print("💡 INTERPRETATION")
+    print("=" * 80)
+    print(f"🏆 Best Authority: {movies[auth_ranking[0]]}")
+    print(f"   → Most recommended by other movies (highest quality)")
+    print()
+    print(f"📚 Best Hub: {movies[hub_ranking[0]]}")
+    print(f"   → Best gateway to other good movies (leads to quality)")
+    print("=" * 80)
+
+def main():
+    """Main function - now with SALSA scoring!"""
+    
+    # Phase 1: Show network
     print_network_info(movies, links)
     
-    # Build authority graph
+    # Phase 2: Build graphs
     authority_graph = build_authority_graph(links)
-    
-    # Build hub graph  
     hub_graph = build_hub_graph(links)
-    
-    # Visualize both graphs
     visualize_graphs(authority_graph, hub_graph, movies)
     
-    # Show graph statistics
-    print("=" * 70)
-    print("📈 GRAPH STATISTICS")
-    print("=" * 70)
+    # Phase 3: Calculate SALSA scores
+    authority_scores, hub_scores = calculate_salsa_scores(
+        authority_graph, 
+        hub_graph, 
+        max_iterations=100
+    )
     
-    for i, movie in enumerate(movies):
-        auth_connections = int(np.sum(authority_graph[i]))
-        hub_connections = int(np.sum(hub_graph[i]))
-        print(f"{movie:<20} Auth connections: {auth_connections:2d} | Hub connections: {hub_connections:2d}")
+    # Display results
+    display_salsa_results(authority_scores, hub_scores, movies)
     
-    print("=" * 70)
+    # Store results for potential Phase 4
+    return authority_scores, hub_scores
 
 if __name__ == "__main__":
-    main()
+    auth_scores, hub_scores = main()
