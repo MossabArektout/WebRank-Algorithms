@@ -14,6 +14,11 @@ Separates repositories into authorities (high-quality tools) and hubs (curated l
 
 **Key idea**: Authorities are linked to by good hubs. Hubs link to good authorities.
 
+### [SALSA](SALSA/)
+Stochastic approach to identify authorities and hubs using random walks on bipartite graphs.
+
+**Key idea**: Uses random walks instead of mutual reinforcement to find authorities (high-quality content) and hubs (gateway content). More resistant to manipulation than HITS.
+
 ## Quick Start
 
 Each folder contains:
